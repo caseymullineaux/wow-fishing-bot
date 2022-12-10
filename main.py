@@ -37,7 +37,7 @@ def update_screen(agent):
         agent.frame = cv.cvtColor(agent.frame, cv.COLOR_RGB2BGR)
         agent.frame_HSV = cv.cvtColor(agent.frame, cv.COLOR_BGR2HSV)
 
-        # cv.imshow("window", agent.frame)
+        cv.imshow("window", agent.frame)
         key = cv.waitKey(1)
         if key == ord("q"):
             break
@@ -67,7 +67,7 @@ if __name__ == "__main__":
         user_input = str.lower(input()).strip()
 
         if user_input == "s":
-            cv.namedWindow("window")
+            # cv.namedWindow("window")
             update_screen_thread = Thread(
                 target=update_screen,
                 args=(main_agent,),
