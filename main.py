@@ -31,6 +31,8 @@ def update_screen(agent):
     """
 
     t0 = time.time()
+    fps_report_delay = 5
+    fps_report_time = time.time()
 
     while True:
         agent.frame = ImageGrab.grab()
@@ -45,11 +47,12 @@ def update_screen(agent):
 
         # Calculate the FPS
         execution_time = time.time() - t0
-        fps = round(1 / execution_time, 2)
-        # print(f"FPS: {str(fps)}")
-        t0 = time.time()
-        time.sleep(5)
+        if time.time() - fps_report_time >= fps_report_delay:
+            print(f"FPS: {str(1/execution_time)}")
+            fps_report_time = time.time()
 
+        t0 = time.time()
+        time.sleep(0.005)
 
 
 def print_menu():
@@ -89,7 +92,7 @@ if __name__ == "__main__":
         elif user_input == "q":
             print("Quitting ...")
             cv.destroyAllWindows()
-            
+
         else:
             print("Invalid selection")
             print_menu()
