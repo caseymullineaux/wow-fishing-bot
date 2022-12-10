@@ -4,6 +4,7 @@ import numpy as np
 import cv2 as cv
 import time
 from threading import Thread
+from fishing.fishing_agent import FishingAgent
 
 
 class MainAgent:
@@ -37,7 +38,7 @@ def update_screen(agent):
         agent.frame = cv.cvtColor(agent.frame, cv.COLOR_RGB2BGR)
         agent.frame_HSV = cv.cvtColor(agent.frame, cv.COLOR_BGR2HSV)
 
-        cv.imshow("window", agent.frame)
+        # cv.imshow("window", agent.frame)
         key = cv.waitKey(1)
         if key == ord("q"):
             break
@@ -47,6 +48,8 @@ def update_screen(agent):
         fps = round(1 / execution_time, 2)
         # print(f"FPS: {str(fps)}")
         t0 = time.time()
+        time.sleep(5)
+
 
 
 def print_menu():
@@ -67,7 +70,6 @@ if __name__ == "__main__":
         user_input = str.lower(input()).strip()
 
         if user_input == "s":
-            # cv.namedWindow("window")
             update_screen_thread = Thread(
                 target=update_screen,
                 args=(main_agent,),
@@ -81,11 +83,13 @@ if __name__ == "__main__":
             pass
 
         elif user_input == "f":
-            pass
+            fishing_agent = FishingAgent(main_agent)
+            fishing_agent.run()
 
         elif user_input == "q":
             print("Quitting ...")
-            break
+            cv.destroyAllWindows()
+            
         else:
             print("Invalid selection")
             print_menu()
