@@ -34,18 +34,25 @@ def update_screen(agent):
     fps_report_delay = 5
     fps_report_time = time.time()
 
+    cv.namedWindow("Capture", cv.WINDOW_NORMAL)
+    cv.resizeWindow("Capture", 800,600)
+
     while True:
-        agent.frame = ImageGrab.grab()
-        agent.frame = np.array(agent.frame)
-        agent.frame = cv.cvtColor(agent.frame, cv.COLOR_RGB2BGR)
+        frame = ImageGrab.grab()
+        frame = np.array(frame)
+        frame = cv.cvtColor(frame, cv.COLOR_RGB2BGR)
+        agent.frame = frame
         agent.frame_HSV = cv.cvtColor(agent.frame, cv.COLOR_BGR2HSV)
 
-        # cv.imshow("window", agent.frame)
+        cv.imshow("Capture", agent.frame)
         key = cv.waitKey(1)
         if key == ord("q"):
-            break
+            # break
+            print("Quitting ...")
+            cv.destroyAllWindows()
+            exit(0)
 
-        # Calculate the FPS
+        # Calculate the FPS1
         execution_time = time.time() - t0
         if time.time() - fps_report_time >= fps_report_delay:
             print(f"FPS: {str(1/execution_time)}")
@@ -68,31 +75,47 @@ if __name__ == "__main__":
 
     # update_screen()
 
-    print_menu()
-    while True:
-        user_input = str.lower(input()).strip()
+    # Start capturing the screen in a separate thread
+    update_screen_thread = Thread(
+        target=update_screen,
+        args=(main_agent,),
+        name="screenshot_thread",
+        daemon=True,
+    )
+    update_screen_thread.start()
+    print("Screen capture started")
 
-        if user_input == "s":
-            update_screen_thread = Thread(
-                target=update_screen,
-                args=(main_agent,),
-                name="screenshot_thread",
-                daemon=True,
-            )
-            update_screen_thread.start()
-            print("Thread started")
+    # Begin fishing
+    fishing_agent = FishingAgent(main_agent)
+    time.sleep(10)
+    fishing_agent.run()
 
-        elif user_input == "z":
-            pass
+    # print_menu()
+    # while True:
+    #     user_input = str.lower(input()).strip()
 
-        elif user_input == "f":
-            fishing_agent = FishingAgent(main_agent)
-            fishing_agent.run()
+    #     if user_input == "s":
+    #         update_screen_thread = Thread(
+    #             target=update_screen,
+    #             args=(main_agent,),
+    #             name="screenshot_thread",
+    #             daemon=True,
+    #         )
+    #         update_screen_thread.start()
+    #         print("Thread started")
 
-        elif user_input == "q":
-            print("Quitting ...")
-            cv.destroyAllWindows()
+    #     elif user_input == "z":
+    #         pass
 
-        else:
-            print("Invalid selection")
-            print_menu()
+    #     elif user_input == "f":
+    #         fishing_agent = FishingAgent(main_agent)
+    #         time.sleep(5)
+    #         fishing_agent.run()
+
+    #     elif user_input == "q":
+    #         print("Quitting ...")
+    #         cv.destroyAllWindows()
+
+    #     else:
+    #         print("Invalid selection")
+    #         print_menu()

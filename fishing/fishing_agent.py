@@ -35,8 +35,6 @@ class FishingAgent:
 
             min_val, max_val, min_loc, max_loc = cv.minMaxLoc(lure_location_array)
             print(max_loc)
-            x = max_loc[0]
-            y = max_loc[1]
             self.move_to_lure(max_loc)
 
         # cv.imshow("Match template",lure_location_array)
@@ -47,30 +45,38 @@ class FishingAgent:
         Moves the mouse cursor in a smooth motion to the location of the detected bobber
         """
         pyautogui.moveTo(coordinates[0], coordinates[1], 1, pyautogui.easeOutQuad)
-        self.watch_lure(self, coordinates)
+        self.watch_lure(coordinates)
 
     def watch_lure(self, coordinates):
         """
         Monitors a single pixel of the lure location waiting for when the pixel changes
         that represents when the bobber moves
         """
-        fishing_timeout = 3
+        fishing_timeout = 20
         watch_time = time.time()
+        pixel = self.main_agent.frame_HSV[coordinates[1], coordinates[0]] # take just a slice of the image (y,x)
+        print(f'Pixel:{pixel}')
         while True:
-            pixel = self.main_agent.cur_imgHSV(coordinates[1], coordinates[0])
-            print(pixel)
+            watch_pixel = self.main_agent.frame_HSV[coordinates[1], coordinates[0]] # take just a slice of the image (y,x)
+            time.sleep(0.1)
+            print(f'Watch Pixel:{watch_pixel}')
+            movement_threshold = -40
 
-            if self.main_agent.zone == "Valdrakken" and self.main_agent.time == "day":
-                if pixel[0] >= 60:
-                    print("Bite detected!")
-                    self.pull_line
+            # if self.main_agent.zone == "Valdrakken" and self.main_agent.time_of_day == "night":
+            # look at the H value (in HSV) and compare change to how much the bobber needs to move to determine a bite
+            if watch_pixel[0] <= pixel[0] +  movement_threshold: 
+                print(f"Bite detected! {watch_pixel[0]} <= {pixel[0] + movement_threshold}")
+                self.pull_line()
+                break
+
             if time.time() - watch_time >= fishing_timeout:
                 print("Fishing timed out")
+                self.pull_line()
                 break
 
     def pull_line(self):
         print("Pulling line")
-        pyautogui.click(button="right")
+        pyautogui.click(button="left")
         time.sleep(3)
 
     def run(self):
