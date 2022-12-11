@@ -4,25 +4,11 @@ import numpy as np
 import cv2 as cv
 import time
 from threading import Thread
-from fishing.fishing_agent import FishingAgent
+from agents.fishing_agent import FishingAgent
+from agents.debug_agent import DebugAgent
+from agents.main_agent import MainAgent
 
 
-class MainAgent:
-    """
-    The main AI of the application that controls all other agents
-    """
-
-    def __init__(self) -> None:
-        self.agents = []
-        self.fishing_thead = None
-
-        self.frame = None  # BGR Image
-        self.frame_HSV = None  # HSV Image
-
-        self.zone = "Valdrakken"
-        self.time_of_day = "night"
-
-        print("MainAgent has started.")
 
 
 def update_screen(agent):
@@ -66,56 +52,56 @@ def print_menu():
     print("Enter a command:")
     print("\tS\tStart the main agent")
     print("\tZ\tSet zone")
-    print("\tF\tStart the fishing agent")
+    print("\tD\tDebug mode")
     print("\tQ\tQuit")
-
 
 if __name__ == "__main__":
     main_agent = MainAgent()
 
-    # update_screen()
+    # # update_screen()
+    # debug_agent = DebugAgent(main_agent, None)
+    # debug_agent.run()
 
-    # Start capturing the screen in a separate thread
-    update_screen_thread = Thread(
-        target=update_screen,
-        args=(main_agent,),
-        name="screenshot_thread",
-        daemon=True,
-    )
-    update_screen_thread.start()
-    print("Screen capture started")
 
-    # Begin fishing
-    fishing_agent = FishingAgent(main_agent)
-    time.sleep(10)
-    fishing_agent.run()
+    print_menu()
+    while True:
+        user_input = str.lower(input()).strip()
 
-    # print_menu()
-    # while True:
-    #     user_input = str.lower(input()).strip()
+        if user_input == "d":
+            # debug_thread = Thread(
+            #     target=debug_bot,
+            #     name="bot debugger",
+            #     daemon=True
+            # )
+            # debug_thread.start()
+            # print("debugging mode started")
+            debug_agent = DebugAgent(main_agent, None)
+            debug_agent.run()
+            
 
-    #     if user_input == "s":
-    #         update_screen_thread = Thread(
-    #             target=update_screen,
-    #             args=(main_agent,),
-    #             name="screenshot_thread",
-    #             daemon=True,
-    #         )
-    #         update_screen_thread.start()
-    #         print("Thread started")
+        elif user_input == "s":
+            # Start capturing the screen in a separate thread
+            update_screen_thread = Thread(
+                target=update_screen,
+                args=(main_agent,),
+                name="screenshot_thread",
+                daemon=True,
+            )
+            update_screen_thread.start()
+            print("Screen capture started")
 
-    #     elif user_input == "z":
-    #         pass
+            # Begin fishing
+            fishing_agent = FishingAgent(main_agent)
+            time.sleep(10)
+            fishing_agent.run()
 
-    #     elif user_input == "f":
-    #         fishing_agent = FishingAgent(main_agent)
-    #         time.sleep(5)
-    #         fishing_agent.run()
+        elif user_input == "z":
+            pass
 
-    #     elif user_input == "q":
-    #         print("Quitting ...")
-    #         cv.destroyAllWindows()
+        elif user_input == "q":
+            print("Quitting ...")
+            cv.destroyAllWindows()
 
-    #     else:
-    #         print("Invalid selection")
-    #         print_menu()
+        else:
+            print("Invalid selection")
+            print_menu()

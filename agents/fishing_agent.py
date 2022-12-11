@@ -11,7 +11,7 @@ class FishingAgent:
 
         self.main_agent = main_agent
         self.fishing_target = cv.imread(
-            "F:\\source\\personal\\caseymullineaux.github.com\\wow-fishing-bot\\fishing\\assets\\fishing_target.png"
+            "F:\\source\\personal\\caseymullineaux.github.com\\wow-fishing-bot\\assets\\fishing_target.png"
         )
         self.fishing_thread = None
 
