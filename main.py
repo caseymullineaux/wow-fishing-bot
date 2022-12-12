@@ -91,7 +91,7 @@ if __name__ == "__main__":
             print("Screen capture started")
 
             # Begin fishing
-            fishing_agent = FishingAgent(main_agent)
+            fishing_agent = FishingAgent(main_agent, debug=True)
             time.sleep(10)
             fishing_agent.run()
 

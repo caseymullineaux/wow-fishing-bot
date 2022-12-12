@@ -2,70 +2,70 @@
 from dataclasses import dataclass
 from typing import Optional
 from .main_agent import MainAgent
-from PIL import ImageGrab
 import cv2
-import numpy as np
-from matplotlib import pyplot as pt
+from utils import ImageProcessor 
 
-def match_img(image, template, threshold):
-    match_result = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
-    match_location = np.where(match_result >= threshold)
-    if not match_location:
-        return False
-    # location = list(zip(*match_location[::-1]))
-    return match_location
 
-    # min_V, max_v, min_pt, max_pt = cv2.minMaxLoc(result)
-    # if max_v < threshold:
-    #     return False
-    # if not max_pt[0] in range(10,40) or max_pt[1] > 20:
-    #     return False
-    # return max_pt
 
 @dataclass
 class DebugAgent:
     agent: MainAgent
     target_image: Optional[cv2.Mat]
+    threshold: float=0.4
 
     def run(self) -> None:
-        cv2.namedWindow("Capture", cv2.WINDOW_NORMAL)
-        cv2.resizeWindow("Capture", 1282,720)
+        # cv2.namedWindow("Capture", cv2.WINDOW_NORMAL)
+        # cv2.resizeWindow("Capture", 1282,720)
         # cv2.namedWindow("BW", cv2.WINDOW_NORMAL)
         # cv2.resizeWindow("BW", 1282,720)
 
-        self.target_image = cv2.imread('assets/bobber-feathers-slice.png')
+        bobber = cv2.imread('assets/valdrakken.png')
+        h = bobber.shape[0]
+        w = bobber.shape[1]
 
         while True:
             # capture the screen
             # frame = ImageGrab.grab()
-            frame = cv2.imread('assets/screenshot_3.jpg', cv2.IMREAD_UNCHANGED)
-            self.agent.frame = np.array(frame)
-            # frame_hsv = cv2.cvtColor(frame, cv2.COLOR_RGB2HSV)
-            # frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-            target = cv2.imread('assets/bobber-feathers-slice.png', cv2.IMREAD_UNCHANGED)
-            # target_hsv = cv2.cvtColor(target, cv2.COLOR_BGR2HSV)
+            frame = cv2.imread('assets/valdrakken_screenshot2.jpg', cv2.IMREAD_UNCHANGED)
+            # self.agent.frame = np.array(frame)
             
+            match = ImageProcessor.find_image(frame, bobber, self.threshold, debug=True)
+            if not match:
+                print("Couldn't find the bobber, trying again ...")
+            else:
+                print(f'I think I see a bobber!')
+                 
+   
+            # time.sleep(5)
+
+
+            # matches = find_image('assets/screenshot_2.jpg', 'assets/bobber.png', 0.6)
+            # print(f"found {len(matches)} matches")
+            # for match in matches:
+            #     x, y, w, h = match
+            #     cv2.rectangle(frame, (x,y), (x + h, y + w), (255,255,0), 1)
+
+            # cv2.imshow("matches", frame)
+
+
+            #time.sleep(10)
+            # result = cv2.matchTemplate(frame, target,cv2.TM_CCOEFF_NORMED)
+            # threshold = .80
+            # min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+            # yloc, xloc = np.where(result >= threshold)
+            # print(f"Matches: {len(xloc)}")
+            # # print(f"Target detected: {max_loc} [Confidence: {max_val}]")
+
+            # w = target.shape[1]
+            # h = target.shape[0]
+            # for (x,y) in zip(xloc, yloc):
+            #     cv2.rectangle(frame, (x,y), (x + h, y + w), (255,255,0), 1)
+
             
-            # w, h = target.shape[::-1]
-
-            result = cv2.matchTemplate(frame, target,cv2.TM_CCOEFF_NORMED)
-            threshold = .80
-            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-            yloc, xloc = np.where(result >= threshold)
-            print(f"Matches: {len(xloc)}")
-            # print(f"Target detected: {max_loc} [Confidence: {max_val}]")
-
-            w = target.shape[1]
-            h = target.shape[0]
-            for (x,y) in zip(xloc, yloc):
-                cv2.rectangle(frame, (x,y), (x + h, y + w), (255,255,0), 1)
-
-            
-            # x = max_loc[0]
-            # y = max_loc[1]
-            # cv2.rectangle(frame, max_loc,(x + w, y + h), (255,255,0), 3 )
-            cv2.imshow("result",frame)
+            # # x = max_loc[0]
+            # # y = max_loc[1]
+            # # cv2.rectangle(frame, max_loc,(x + w, y + h), (255,255,0), 3 )
+            # cv2.imshow("result",frame)
 
             # # draw a rectangle around the target
             

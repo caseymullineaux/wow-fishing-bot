@@ -1,21 +1,23 @@
-import cv2 as cv
+from dataclasses import dataclass
+import cv2
 import numpy as np
 import pyautogui
 import time
 import os
+from utils import ImageProcessor
 
-
+@dataclass
 class FishingAgent:
-    def __init__(self, main_agent) -> None:
-        path = os.getcwd()
-
+    def __init__(self, main_agent, debug: bool = False) -> None:
         self.main_agent = main_agent
-        self.fishing_target = cv.imread(
-            "F:\\source\\personal\\caseymullineaux.github.com\\wow-fishing-bot\\assets\\fishing_target.png"
-        )
+        self.fishing_target = cv2.imread('assets/valdrakken.png')
         self.fishing_thread = None
+        self.debug = debug
 
     def cast_lure(self):
+        '''
+        Presses the assigned hotkey to cast the fishing rod
+        '''
         print("Casting  ...")
         pyautogui.press("num1")
         time.sleep(2)
@@ -27,18 +29,24 @@ class FishingAgent:
         """
         if self.main_agent.frame is not None:
             frame = self.main_agent.frame
+            bobber = self.fishing_target
             print("Searching for lure ...")
-            lure_location = cv.matchTemplate(
-                frame, self.fishing_target, cv.TM_CCOEFF_NORMED
-            )
-            lure_location_array = np.array(lure_location)
 
-            min_val, max_val, min_loc, max_loc = cv.minMaxLoc(lure_location_array)
-            print(max_loc)
-            self.move_to_lure(max_loc)
+            lure_location = ImageProcessor.find_image(frame, bobber, 0.8, debug=self.debug)
 
-        # cv.imshow("Match template",lure_location_array)
-        # cv.waitKey(0)
+            # lure_location = cv2.matchTemplate(
+            #     frame, self.fishing_target, cv2.TM_CCOEFF_NORMED
+            # )
+            # lure_location_array = np.array(lure_location)
+
+            # min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(lure_location_array)
+            if lure_location:
+                x, y, w, h = lure_location
+                coordinates = ImageProcessor.find_middle(lure_location)
+                self.move_to_lure(coordinates)
+
+        # cv2.imshow("Match template",lure_location_array)
+        # cv2.waitKey(0)
 
     def move_to_lure(self, coordinates):
         """
@@ -55,26 +63,26 @@ class FishingAgent:
         fishing_timeout = 20
         watch_time = time.time()
         pixel = self.main_agent.frame_HSV[coordinates[1], coordinates[0]] # take just a slice of the image (y,x)
-        print(f'Pixel:{pixel}')
+        # print(f'Pixel:{pixel}')
         while True:
             watch_pixel = self.main_agent.frame_HSV[coordinates[1], coordinates[0]] # take just a slice of the image (y,x)
             time.sleep(0.1)
-            print(f'Watch Pixel:{watch_pixel}')
+            # print(f'Watch Pixel:{watch_pixel}')
             movement_threshold = -40
 
             # if self.main_agent.zone == "Valdrakken" and self.main_agent.time_of_day == "night":
             # look at the H value (in HSV) and compare change to how much the bobber needs to move to determine a bite
             if watch_pixel[0] <= pixel[0] +  movement_threshold: 
                 print(f"Bite detected! {watch_pixel[0]} <= {pixel[0] + movement_threshold}")
-                self.pull_line()
+                self.click_bobber()
                 break
 
             if time.time() - watch_time >= fishing_timeout:
                 print("Fishing timed out")
-                self.pull_line()
+                self.click_bobber()
                 break
 
-    def pull_line(self):
+    def click_bobber(self):
         print("Pulling line")
         pyautogui.click(button="left")
         time.sleep(3)
