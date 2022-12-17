@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 
 class ScreenCaptureAgent:
-    def __init__(self):
+    def __init__(self) -> None:
         self.img = None
         self.capture_process = None
         self.fps = None
@@ -25,7 +25,7 @@ class ScreenCaptureAgent:
         fps_report_delay = 1
 
         frame_count = 0
-        with mss.mss() as screenshot:
+        with mss() as screenshot:
             while True:
                 self.img = screenshot.grab(monitor=self.monitor) # captures in BGR
                 frame_count += 1
@@ -60,14 +60,15 @@ class ScreenCaptureAgent:
 
                     # display the screenshot in a new window
                     cv2.imshow("Computer Vision", small_img)
-                    cv2.waitKey(10)
+                    cv2.waitKey(1)
             
 if __name__ == "__main__":
     screen_agent = ScreenCaptureAgent()
-    screen_agent.capture_process = multiprocessing.Process(
-        target=screen_agent.capture_screen, 
-        args=(),
-        name="WowFishBot: Screen capture process"
-    )
-    screen_agent.capture_process.start()
+    screen_agent.capture_screen()
+    # screen_agent.capture_process = multiprocessing.Process(
+    #         target=screen_agent.capture_screen, 
+    #         args=(),
+    #         name="WowFishBot: Screen capture process"
+    #     )
+    # screen_agent.capture_process.start()
 
