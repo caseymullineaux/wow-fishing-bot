@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-frame = cv2.imread('assets/screenshot_0.jpg')
+frame = cv2.imread('assets/screenshot_2.jpg')
 
 # Create a slider bar to get the HSV values needed to detect the color
 
@@ -9,14 +9,20 @@ frame = cv2.imread('assets/screenshot_0.jpg')
 def trackbar_callback(x):
     pass
 
+init_low_hue = 0
+init_low_sat = 0
+init_low_val = 160
+init_high_hue = 111
+init_high_sat = 255
+init_high_val = 255
 
 cv2.namedWindow("Values")
-cv2.createTrackbar("Lower Hue", "Values", 90, 180, trackbar_callback)
-cv2.createTrackbar("Lower Saturation", "Values", 65, 255, trackbar_callback)
-cv2.createTrackbar("Lower Value", "Values", 167, 255, trackbar_callback)
-cv2.createTrackbar("Upper Hue", "Values", 120, 180, trackbar_callback)
-cv2.createTrackbar("Upper Saturation", "Values", 255, 255, trackbar_callback)
-cv2.createTrackbar("Upper Value", "Values", 255, 255, trackbar_callback)
+cv2.createTrackbar("Lower Hue", "Values", init_low_hue, 179, trackbar_callback)
+cv2.createTrackbar("Lower Saturation", "Values", init_low_sat, 255, trackbar_callback)
+cv2.createTrackbar("Lower Value", "Values", init_low_val, 255, trackbar_callback)
+cv2.createTrackbar("Upper Hue", "Values", init_high_hue, 179, trackbar_callback)
+cv2.createTrackbar("Upper Saturation", "Values", init_high_sat, 255, trackbar_callback)
+cv2.createTrackbar("Upper Value", "Values", init_high_val, 255, trackbar_callback)
 
 while True:
     # _, frame = cap.read()
