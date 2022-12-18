@@ -1,4 +1,5 @@
 
+from dataclasses import dataclass
 import multiprocessing
 import pyautogui
 import time
@@ -6,10 +7,11 @@ from mss import mss
 import cv2
 import numpy as np
 
+@dataclass
 class ScreenCaptureAgent:
     def __init__(self):
         self.img = None
-        self.capture_process = None
+        self.capture_process = multiprocessing.Process()
         self.fps = None
         self.enable_preview = True
 
@@ -64,10 +66,11 @@ class ScreenCaptureAgent:
             
 if __name__ == "__main__":
     screen_agent = ScreenCaptureAgent()
-    screen_agent.capture_process = multiprocessing.Process(
+    process = multiprocessing.Process(
         target=screen_agent.capture_screen, 
         args=(),
         name="WowFishBot: Screen capture process"
     )
+    screen_agent.capture_process = process
     screen_agent.capture_process.start()
 
