@@ -1,5 +1,8 @@
 import cv2
-
+from mss import mss
+import time
+import numpy as np
+from PIL import Image
 
 def find_middle(coordinates) -> tuple:
     '''
@@ -10,17 +13,17 @@ def find_middle(coordinates) -> tuple:
     return middle
 
 
-def find_image(haystack: cv2.Mat, needle: cv2.Mat, threshold:float, debug:bool=False)-> tuple | None:
+def find_image(haystack: cv2.Mat, needle: cv2.Mat, threshold:float, debug:bool=False)-> dict | None:
         '''
         Finds an image (needle) within another image (haystack) 
         and retuns the x,y (top left) and w, h of a bounding area that surrounds the detection
         '''
 
         # convert the images to HSV because it's easier to match images
-        # haystack = cv2.cvtColor(haystack, cv2.COLOR_BGR2HSV)
-        # needle = cv2.cvtColor(needle, cv2.COLOR_BGR2HSV)
-        haystack = cv2.cvtColor(haystack, cv2.COLOR_BGR2GRAY)
-        needle = cv2.cvtColor(needle, cv2.COLOR_BGR2GRAY)
+        haystack = cv2.cvtColor(haystack, cv2.COLOR_BGR2HSV)
+        needle = cv2.cvtColor(needle, cv2.COLOR_BGR2HSV)
+        # haystack = cv2.cvtColor(haystack, cv2.COLOR_BGR2GRAY)
+        # needle = cv2.cvtColor(needle, cv2.COLOR_BGR2GRAY)
         # do a template match
         match = cv2.matchTemplate(haystack, needle, cv2.TM_CCOEFF_NORMED)
 
@@ -39,16 +42,24 @@ def find_image(haystack: cv2.Mat, needle: cv2.Mat, threshold:float, debug:bool=F
         y = max_loc[1]
         coordinates = (x, y, w, h)
 
-        if debug:
-            middle = find_middle(coordinates)
-            print(f"Match found: {round(max_val,2)}/{threshold} @ {middle}")
+        # if debug:
+        #     middle = find_middle(coordinates)
+        #     print(f"Match found: {round(max_val,2)}/{threshold} @ {middle}")
             
-            # draw a rectangle around the match
-            cv2.rectangle(haystack, (x,y), (x+w,y+h), (255,255,0), 1)       
-            cv2.imshow("match", haystack)     
-            cv2.imshow("bobber", needle)
+        #     # draw a rectangle around the match
+        #     cv2.rectangle(haystack, (x,y), (x+w,y+h), (255,255,0), 1)       
+        #     cv2.imshow("match", haystack)     
+        #     cv2.imshow("bobber", needle)
             
         # return coordinates of the match
-        return(x,y,w,h)
+        return{"x":x,"y": y,"w": w,"h": h}
 
 
+
+def capture_screen(monitor, debug=False)-> np.ndarray:
+    with mss() as screenshot:
+        # while True:
+        img = screenshot.grab(monitor=monitor) # captures in BGR
+        image = Image.frombytes("RGB", img.size, img.rgb)
+
+    return np.array(image)
