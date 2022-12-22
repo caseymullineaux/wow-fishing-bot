@@ -17,7 +17,7 @@ class DebugAgent:
     monitor_num: int = 2
 
     def run(self) -> None:
-        bobber = cv2.imread('assets/bobber4.png')
+        bobber = cv2.imread('assets/bobber5.png')
         h = bobber.shape[0]
         w = bobber.shape[1]
 
@@ -41,10 +41,11 @@ class DebugAgent:
             while True:
                 
                 # capture the screen
-                # frame = cv2.imread('assets/valdrakken_screenshot4.jpg', cv2.IMREAD_UNCHANGED)
+                frame = cv2.imread('assets/valdrakken_screenshot.jpg', cv2.IMREAD_UNCHANGED)
+                # frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
                 # capture the screen
-                frame = np.array(screenshot.grab(monitor=monitor))
+                # frame = np.array(screenshot.grab(monitor=monitor))
                 frame_count += 1
                 
                 match = ImageProcessor.find_image(frame, bobber, self.threshold, debug=True)
